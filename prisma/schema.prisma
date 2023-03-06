@@ -33,3 +33,25 @@ type Address {
   town           String?
   postcode       String
 }
+
+model PrayerTime {
+  id          String          @id @default(auto()) @map("_id") @db.ObjectId
+  day         Int
+  month       Int
+  prayerTimes DailyPrayerTime
+}
+
+type DailyPrayerTime {
+  fajr    Prayer
+  sunrise String
+  zuhr    Prayer
+  asr     Prayer
+  maghrib Prayer
+  isha    Prayer
+}
+
+type Prayer {
+  start    String
+  startTwo String?
+  jamaah   String?
+}
