@@ -26,6 +26,7 @@
     "react-dom": "18.2.0"
   },
   "devDependencies": {
+    "@faker-js/faker": "^7.6.0",
     "@types/node": "^18.14.6",
     "autoprefixer": "^10.4.13",
     "postcss": "^8.4.21",
