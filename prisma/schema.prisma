@@ -9,3 +9,49 @@ datasource db {
   provider = "mongodb"
   url      = env("DATABASE_URL")
 }
+
+model User {
+  id        String @id @default(auto()) @map("_id") @db.ObjectId
+  email     String @unique
+  firstName String
+  lastName  String
+}
+
+model Mosque {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  name        String
+  address     Address?
+  email       String?
+  phoneNumber String?
+}
+
+// Address is an embedded document
+type Address {
+  addressLineOne String
+  addressLineTwo String?
+  city           String
+  town           String?
+  postcode       String
+}
+
+model PrayerTime {
+  id          String          @id @default(auto()) @map("_id") @db.ObjectId
+  day         Int
+  month       Int
+  prayerTimes DailyPrayerTime
+}
+
+type DailyPrayerTime {
+  fajr    Prayer
+  sunrise String
+  zuhr    Prayer
+  asr     Prayer
+  maghrib Prayer
+  isha    Prayer
+}
+
+type Prayer {
+  start    String
+  startTwo String?
+  jamaah   String?
+}
