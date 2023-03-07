@@ -2,6 +2,7 @@ export const getServerSideProps = async () => {
   return {
     props: {
       pageTitle: "Dashboard",
+      activeIndex: 0,
     },
   }
 }

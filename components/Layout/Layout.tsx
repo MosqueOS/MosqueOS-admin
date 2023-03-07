@@ -2,23 +2,28 @@ import { Fragment } from "react"
 import { Disclosure, Menu, Transition } from "@headlessui/react"
 import { Bars3Icon, BellIcon, XMarkIcon } from "@heroicons/react/24/outline"
 import Head from "next/head"
+import { useUser } from "@auth0/nextjs-auth0/client"
+import md5 from "md5"
+import Image from "next/image"
 
-const user = {
-  name: "Dilwoar Hussain",
-  email: "dilwoarhussain@mosqueos.com",
-  imageUrl:
-    "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
+const getGravatarURL = (email: string | null | undefined) => {
+  const address = String(email).trim().toLowerCase()
+  const hash = md5(address)
+
+  return `https://www.gravatar.com/avatar/${hash}`
 }
+
 const navigation = [
-  { name: "Dashboard", href: "/", current: true },
+  { name: "Dashboard", href: "/", current: false },
   { name: "Mosque Profile", href: "/mosque-profile", current: false },
   { name: "Prayer Times", href: "/prayer-times", current: false },
   { name: "Screens", href: "/screens", current: false },
 ]
+
 const userNavigation = [
-  { name: "Your Profile", href: "/settings/profile" },
-  { name: "Settings", href: "/settings" },
-  { name: "Log out", href: "/auth/logout" },
+  /*   { name: "Your Profile", href: "/settings/profile" },
+  { name: "Settings", href: "/settings" }, */
+  { name: "Log out", href: "/api/auth/logout" },
 ]
 
 function classNames(...classes: string[]) {
@@ -26,7 +31,10 @@ function classNames(...classes: string[]) {
 }
 
 export default function Layout({ children }: any) {
+  const { user, error, isLoading } = useUser()
+
   const pageTitle = children.props.pageTitle
+  const activeIndex = children.props.activeIndex
 
   return (
     <>
@@ -51,25 +59,28 @@ export default function Layout({ children }: any) {
                   <div className="relative flex h-16 items-center justify-between lg:border-b lg:border-indigo-400 lg:border-opacity-25">
                     <div className="flex items-center px-2 lg:px-0">
                       <div className="flex-shrink-0">
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
                         <img
                           className="block h-8"
                           src="/branding/logo-white.png"
-                          alt="Your Company"
+                          alt="MosqueOS Logo"
                         />
                       </div>
                       <div className="hidden lg:ml-10 lg:block">
                         <div className="flex space-x-4">
-                          {navigation.map((item) => (
+                          {navigation.map((item, index) => (
                             <a
                               key={item.name}
                               href={item.href}
                               className={classNames(
-                                item.current
+                                activeIndex === index
                                   ? "bg-indigo-700 text-white"
                                   : "text-white hover:bg-indigo-500 hover:bg-opacity-75",
                                 "rounded-md py-2 px-3 text-sm font-medium",
                               )}
-                              aria-current={item.current ? "page" : undefined}
+                              aria-current={
+                                activeIndex === index ? "page" : undefined
+                              }
                             >
                               {item.name}
                             </a>
@@ -96,22 +107,16 @@ export default function Layout({ children }: any) {
                     </div>
                     <div className="hidden lg:ml-4 lg:block">
                       <div className="flex items-center">
-                        <button
-                          type="button"
-                          className="flex-shrink-0 rounded-full bg-indigo-600 p-1 text-indigo-200 hover:text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigo-600"
-                        >
-                          <span className="sr-only">View notifications</span>
-                          <BellIcon className="h-6 w-6" aria-hidden="true" />
-                        </button>
-
                         {/* Profile dropdown */}
                         <Menu as="div" className="relative ml-3 flex-shrink-0">
                           <div>
                             <Menu.Button className="flex rounded-full bg-indigo-600 text-sm text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigo-600">
                               <span className="sr-only">Open user menu</span>
-                              <img
+                              <Image
+                                width={32}
+                                height={32}
                                 className="h-8 w-8 rounded-full"
-                                src={user.imageUrl}
+                                src={getGravatarURL(user?.email)}
                                 alt=""
                               />
                             </Menu.Button>
@@ -151,18 +156,20 @@ export default function Layout({ children }: any) {
 
                 <Disclosure.Panel className="lg:hidden">
                   <div className="space-y-1 px-2 pt-2 pb-3">
-                    {navigation.map((item) => (
+                    {navigation.map((item, index) => (
                       <Disclosure.Button
                         key={item.name}
                         as="a"
                         href={item.href}
                         className={classNames(
-                          item.current
+                          activeIndex === index
                             ? "bg-indigo-700 text-white"
                             : "text-white hover:bg-indigo-500 hover:bg-opacity-75",
                           "block rounded-md py-2 px-3 text-base font-medium",
                         )}
-                        aria-current={item.current ? "page" : undefined}
+                        aria-current={
+                          activeIndex === index ? "page" : undefined
+                        }
                       >
                         {item.name}
                       </Disclosure.Button>
@@ -171,27 +178,22 @@ export default function Layout({ children }: any) {
                   <div className="border-t border-indigo-700 pt-4 pb-3">
                     <div className="flex items-center px-5">
                       <div className="flex-shrink-0">
-                        <img
+                        <Image
+                          width={32}
+                          height={32}
                           className="h-10 w-10 rounded-full"
-                          src={user.imageUrl}
+                          src={getGravatarURL(user?.email)}
                           alt=""
                         />
                       </div>
                       <div className="ml-3">
                         <div className="text-base font-medium text-white">
-                          {user.name}
+                          {user?.name}
                         </div>
                         <div className="text-sm font-medium text-indigo-300">
-                          {user.email}
+                          {user?.email}
                         </div>
                       </div>
-                      <button
-                        type="button"
-                        className="ml-auto flex-shrink-0 rounded-full bg-indigo-600 p-1 text-indigo-200 hover:text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigo-600"
-                      >
-                        <span className="sr-only">View notifications</span>
-                        <BellIcon className="h-6 w-6" aria-hidden="true" />
-                      </button>
                     </div>
                     <div className="mt-3 space-y-1 px-2">
                       {userNavigation.map((item) => (
