@@ -5,6 +5,7 @@ import Head from "next/head"
 import { useUser } from "@auth0/nextjs-auth0/client"
 import md5 from "md5"
 import Image from "next/image"
+import Link from "next/link"
 
 const getGravatarURL = (email: string | null | undefined) => {
   const address = String(email).trim().toLowerCase()
@@ -69,7 +70,7 @@ export default function Layout({ children }: any) {
                       <div className="hidden lg:ml-10 lg:block">
                         <div className="flex space-x-4">
                           {navigation.map((item, index) => (
-                            <a
+                            <Link
                               key={item.name}
                               href={item.href}
                               className={classNames(
@@ -83,7 +84,7 @@ export default function Layout({ children }: any) {
                               }
                             >
                               {item.name}
-                            </a>
+                            </Link>
                           ))}
                         </div>
                       </div>
@@ -110,15 +111,27 @@ export default function Layout({ children }: any) {
                         {/* Profile dropdown */}
                         <Menu as="div" className="relative ml-3 flex-shrink-0">
                           <div>
-                            <Menu.Button className="flex rounded-full bg-indigo-600 text-sm text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigo-600">
+                            <Menu.Button className="flex rounded bg-indigo-600 text-sm text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigo-600">
                               <span className="sr-only">Open user menu</span>
-                              <Image
-                                width={32}
-                                height={32}
-                                className="h-8 w-8 rounded-full"
-                                src={getGravatarURL(user?.email)}
-                                alt=""
-                              />
+                              <div className="flex items-start px-5 text-right">
+                                <div className="mr-3">
+                                  <div className="text-base font-medium text-white">
+                                    {user?.name}
+                                  </div>
+                                  <div className="text-sm font-medium text-indigo-300">
+                                    {user?.email}
+                                  </div>
+                                </div>
+                                <div className="flex-shrink-0">
+                                  <Image
+                                    width={32}
+                                    height={32}
+                                    className="h-10 w-10 rounded-full"
+                                    src={getGravatarURL(user?.email)}
+                                    alt=""
+                                  />
+                                </div>
+                              </div>
                             </Menu.Button>
                           </div>
                           <Transition
@@ -134,7 +147,7 @@ export default function Layout({ children }: any) {
                               {userNavigation.map((item) => (
                                 <Menu.Item key={item.name}>
                                   {({ active }) => (
-                                    <a
+                                    <Link
                                       href={item.href}
                                       className={classNames(
                                         active ? "bg-gray-100" : "",
@@ -142,7 +155,7 @@ export default function Layout({ children }: any) {
                                       )}
                                     >
                                       {item.name}
-                                    </a>
+                                    </Link>
                                   )}
                                 </Menu.Item>
                               ))}
