@@ -1,8 +1,8 @@
 # MosqueOS Admin
 
-## Getting Started
+## Getting Started
 
-### Prerequisite
+### Prerequisite
 
 Get an account on [Mongo Atlas](https://www.mongodb.com/cloud/atlas/register). We need this as Prisma requires Replication and this isn't easy to set up on local environment.
 
@@ -18,7 +18,7 @@ Go to http://localhost:3000
 
 ## Database
 
-### Running database seed
+### Running database seed
 
 ```
 npm run db:seed
