@@ -18,11 +18,12 @@ model User {
 }
 
 model Mosque {
-  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  id          String       @id @default(auto()) @map("_id") @db.ObjectId
   name        String
   address     Address?
   email       String?
   phoneNumber String?
+  PrayerTime  PrayerTime[]
 }
 
 // Address is an embedded document
@@ -39,6 +40,8 @@ model PrayerTime {
   day         Int
   month       Int
   prayerTimes DailyPrayerTime
+  Mosque      Mosque?         @relation(fields: [mosqueId], references: [id])
+  mosqueId    String?         @db.ObjectId
 }
 
 type DailyPrayerTime {
