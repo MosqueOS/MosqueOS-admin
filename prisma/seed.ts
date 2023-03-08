@@ -30,9 +30,11 @@ async function main() {
     data: {
       name: `${faker.address.cityName()} Mosque`,
       address: {
-        addressLineOne: "123 East St",
-        city: "London",
-        postcode: "E1",
+        addressLineOne: faker.address.streetAddress(),
+        addressLineTwo: faker.address.street(),
+        city: faker.address.city(),
+        town: faker.address.cityName(),
+        postcode: faker.address.zipCode(),
       },
       email: faker.internet.email(),
       phoneNumber: faker.phone.number(),
