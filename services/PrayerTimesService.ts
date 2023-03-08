@@ -5,5 +5,13 @@ export async function getPrayerTimesForMosque(mosqueId: string) {
     where: {
       mosqueId,
     },
+    orderBy: [
+      {
+        month: "asc",
+      },
+      {
+        day: "asc",
+      },
+    ],
   })
 }
