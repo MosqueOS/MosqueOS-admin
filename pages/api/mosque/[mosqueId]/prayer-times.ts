@@ -1,7 +1,7 @@
 import { getPrayerTimesForMosque } from "@/services/PrayerTimesService"
 import type { NextApiRequest, NextApiResponse } from "next"
 
-export interface Data {
+interface Data {
   id: string
   day: number
   month: number
@@ -9,7 +9,7 @@ export interface Data {
   mosqueId: string
 }
 
-export interface PrayerTimes {
+interface PrayerTimes {
   fajr: PrayerTime
   sunrise: string
   zuhr: PrayerTime
@@ -18,7 +18,7 @@ export interface PrayerTimes {
   isha: PrayerTime
 }
 
-export interface PrayerTime {
+interface PrayerTime {
   start: string
   startTwo: string | null
   jamaah: string
