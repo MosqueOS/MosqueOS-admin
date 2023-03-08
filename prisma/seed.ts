@@ -4,6 +4,38 @@ import { faker } from "@faker-js/faker"
 const prisma = new PrismaClient()
 
 async function main() {
+  const mosque = await prisma.mosque.create({
+    data: {
+      name: `${faker.address.cityName()} Mosque`,
+      address: {
+        addressLineOne: faker.address.streetAddress(),
+        addressLineTwo: faker.address.street(),
+        city: faker.address.city(),
+        town: faker.address.cityName(),
+        postcode: faker.address.zipCode(),
+      },
+      email: faker.internet.email(),
+      phoneNumber: faker.phone.number(),
+    },
+  })
+
+  console.log("====================================================")
+  console.log(`New Mosque added: ${mosque.name}`)
+  console.log(mosque)
+
+  const localUserEmail =
+    process.env.LOCAL_USER_EMAIL ?? faker.internet.exampleEmail()
+
+  const localUser = await prisma.user.upsert({
+    where: { email: localUserEmail },
+    update: {},
+    create: {
+      email: localUserEmail,
+      firstName: "Local",
+      lastName: "User",
+    },
+  })
+
   const alice = await prisma.user.upsert({
     where: { email: "alice@prisma.io" },
     update: {},
@@ -24,26 +56,37 @@ async function main() {
     },
   })
 
-  console.log(alice, bob)
+  console.log("====================================================")
+  console.log(localUser, alice, bob)
 
-  const mosque = await prisma.mosque.create({
+  // connect user and mosque record
+  await prisma.mosqueAdmins.create({
     data: {
-      name: `${faker.address.cityName()} Mosque`,
-      address: {
-        addressLineOne: faker.address.streetAddress(),
-        addressLineTwo: faker.address.street(),
-        city: faker.address.city(),
-        town: faker.address.cityName(),
-        postcode: faker.address.zipCode(),
-      },
-      email: faker.internet.email(),
-      phoneNumber: faker.phone.number(),
+      user: { connect: { id: localUser.id } },
+      mosque: { connect: { id: mosque.id } },
     },
   })
 
-  console.log(`New Mosque added: ${mosque.name}`)
-  console.log(mosque)
+  await prisma.mosqueAdmins.create({
+    data: {
+      user: { connect: { id: alice.id } },
+      mosque: { connect: { id: mosque.id } },
+    },
+  })
 
+  await prisma.mosqueAdmins.create({
+    data: {
+      user: { connect: { id: bob.id } },
+      mosque: { connect: { id: mosque.id } },
+    },
+  })
+
+  console.log("====================================================")
+  console.log(`New Mosque Admin added: ${localUser.email} to ${mosque.name}`)
+  console.log(`New Mosque Admin added: ${alice.email} to ${mosque.name}`)
+  console.log(`New Mosque Admin added: ${bob.email} to ${mosque.name}`)
+
+  console.log("====================================================")
   console.log(`Starting prayer time generation for ${mosque.name}...`)
 
   const monthPrayerConfigs = [
