@@ -126,6 +126,7 @@ async function main() {
                 },
                 asr: {
                   start: "3:30 pm",
+                  startTwo: "4:40 pm",
                   jamaah: "4:00 pm",
                 },
                 maghrib: {

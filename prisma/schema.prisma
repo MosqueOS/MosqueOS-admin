@@ -58,12 +58,17 @@ type DailyPrayerTime {
   fajr    Prayer
   sunrise String
   zuhr    Prayer
-  asr     Prayer
+  asr     AsrPrayer
   maghrib Prayer
   isha    Prayer
 }
 
 type Prayer {
+  start  String
+  jamaah String?
+}
+
+type AsrPrayer {
   start    String
   startTwo String?
   jamaah   String?
