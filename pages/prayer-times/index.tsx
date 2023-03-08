@@ -1,8 +1,19 @@
-export const getServerSideProps = async () => {
+import { getPrayerTimesForMosque } from "@/services/PrayerTimesService"
+import { getUserWithRoles } from "@/services/UserService"
+import { getSession } from "@auth0/nextjs-auth0"
+import { GetServerSideProps } from "next"
+import { find } from "lodash"
+
+export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
+  const session: any = await getSession(req, res)
+  const user = await getUserWithRoles(session.user.email)
+  const prayerTimes = await getPrayerTimesForMosque(user.admins[0].mosqueId)
+
   return {
     props: {
       pageTitle: "Prayer Times",
       activeIndex: 2,
+      prayerTimes,
     },
   }
 }
@@ -38,10 +49,10 @@ const columns = [
   { name: "Isha Jama'ah" },
 ]
 
-export default function PrayerTimes() {
+export default function PrayerTimes({ prayerTimes }: any) {
   return (
     <div>
-      {months.map((month) => (
+      {months.map((month, monthIndex) => (
         <section key={month.name} className="mb-7 border-b">
           <h2 className="mb-2 text-xl font-semibold">{month.name}</h2>
           <table className="min-w-full divide-y divide-gray-300">
@@ -49,7 +60,7 @@ export default function PrayerTimes() {
               <tr>
                 {columns.map((col, index) => (
                   <th
-                    key={`${month.name}_${col.name}`}
+                    key={`${month.name}_${col.name}_${index}`}
                     scope="col"
                     className="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-3"
                   >
@@ -60,22 +71,59 @@ export default function PrayerTimes() {
             </thead>
             <tbody className="bg-white">
               {Array.from({ length: month.numberOfDays }, (_, i) => i + 1).map(
-                (dayOfMonth, index) => (
-                  <tr
-                    key={`${month.name}_${dayOfMonth}`}
-                    className={index % 2 === 0 ? undefined : "bg-gray-50"}
-                  >
-                    <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-3">
-                      {dayOfMonth}
-                    </td>
-                    <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-3">
-                      {dayOfMonth}
-                    </td>
-                    <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-3">
-                      {dayOfMonth}
-                    </td>
-                  </tr>
-                ),
+                (dayOfMonth, index) => {
+                  const prayerTimeForDayOfMonth = find(prayerTimes, {
+                    day: dayOfMonth,
+                    month: monthIndex + 1,
+                  })
+
+                  return (
+                    <tr
+                      key={`${month.name}_${dayOfMonth}`}
+                      className={index % 2 === 0 ? undefined : "bg-gray-50"}
+                    >
+                      <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-3">
+                        {dayOfMonth}
+                      </td>
+                      <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-3">
+                        {prayerTimeForDayOfMonth.prayerTimes.fajr.start}
+                      </td>
+                      <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-3">
+                        {prayerTimeForDayOfMonth.prayerTimes.fajr.jamaah}
+                      </td>
+                      <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-3">
+                        {prayerTimeForDayOfMonth.prayerTimes.sunrise}
+                      </td>
+                      <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-3">
+                        {prayerTimeForDayOfMonth.prayerTimes.zuhr.start}
+                      </td>
+                      <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-3">
+                        {prayerTimeForDayOfMonth.prayerTimes.zuhr.jamaah}
+                      </td>
+                      <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-3">
+                        {prayerTimeForDayOfMonth.prayerTimes.asr.start}
+                      </td>
+                      <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-3">
+                        {prayerTimeForDayOfMonth.prayerTimes.asr.startTwo}
+                      </td>
+                      <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-3">
+                        {prayerTimeForDayOfMonth.prayerTimes.asr.jamaah}
+                      </td>
+                      <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-3">
+                        {prayerTimeForDayOfMonth.prayerTimes.maghrib.start}
+                      </td>
+                      <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-3">
+                        {prayerTimeForDayOfMonth.prayerTimes.maghrib.jamaah}
+                      </td>
+                      <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-3">
+                        {prayerTimeForDayOfMonth.prayerTimes.isha.start}
+                      </td>
+                      <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-3">
+                        {prayerTimeForDayOfMonth.prayerTimes.isha.jamaah}
+                      </td>
+                    </tr>
+                  )
+                },
               )}
             </tbody>
           </table>
